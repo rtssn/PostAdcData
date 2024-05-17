@@ -15,16 +15,21 @@ namespace PostAdcData
         private static string MySsid = "SSID";
         private static string MyPassword = "WIFI PASSWORD";
 
-        // ������H�̒�R�l
+        // 分圧回路の抵抗値
         private static int R1 = 10000;
         private static int R2 = 10000;
 
-        // ���M�Ԋu
+        // 送信間隔
         private static int Interval = 60 * 1000;
+
+        // HttpClient
+        private static HttpClient HttpClient;
 
         public static void Main()
         {
             ConnectWiFi();
+
+            HttpClient = new HttpClient();
 
             while (true)
             {
@@ -46,7 +51,7 @@ namespace PostAdcData
         }
 
         /// <summary>
-        /// WiFi�ɐڑ����܂��B
+        /// WiFiに接続します。
         /// </summary>
         private static void ConnectWiFi()
         {
@@ -75,9 +80,9 @@ namespace PostAdcData
         }
 
         /// <summary>
-        /// �d���̓ǂݎ����s���܂��B
+        /// 電圧の読み取りを行います。
         /// </summary>
-        /// <returns>�ǂݎ�茋�ʂ�Ԃ��܂��B</returns>
+        /// <returns>読み取り結果を返します。</returns>
         private static VoltData ReadAdc()
         {
             AdcController adc1 = new AdcController();
@@ -95,16 +100,15 @@ namespace PostAdcData
         }
 
         /// <summary>
-        /// �f�[�^�̑��M���s���܂��B
+        /// データの送信を行います。
         /// </summary>
-        /// <param name="voltData">�d���f�[�^���w�肵�܂��B</param>
+        /// <param name="voltData">電圧データを指定します。</param>
         private static void SendData(VoltData voltData)
         {
             string json = JsonSerializer.SerializeObject(voltData);
             StringContent content = new StringContent(json);
-
-            HttpClient httpClient = new HttpClient();
-            httpClient.Post("[POST TO SERVER]", content);
+            
+            HttpClient.Post("[POST TO SERVER]", content);
         }
     }
 }
